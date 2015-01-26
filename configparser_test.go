@@ -12,11 +12,12 @@ func Test(t *testing.T) { TestingT(t) }
 
 // partition specific testsuite
 type ConfigParserTestSuite struct {
+	cfg *ConfigParser
 }
 
 var _ = Suite(&ConfigParserTestSuite{})
 
-const SIMPLE_INI = `
+const SAMPLE_INI = `
 [service]
 base: system-image.ubuntu.com
 http_port: 80
@@ -28,28 +29,59 @@ version_detail: ubuntu=20150121,raw-device=20150121,version=246
 
 [foo]
 bar: baz
+yesbool: On
+nobool: off
+float: 3.14
 `
 
-func (s *ConfigParserTestSuite) TestSimple(c *C) {
-	cfg := New()
-	c.Assert(cfg, NotNil)
-
-	err := cfg.Read(strings.NewReader(SIMPLE_INI))
+func (s *ConfigParserTestSuite) SetUpTest(c *C) {
+	s.cfg = New()
+	c.Assert(s.cfg, NotNil)
+	err := s.cfg.Read(strings.NewReader(SAMPLE_INI))
 	c.Assert(err, IsNil)
+}
 
-	val, err := cfg.Get("service", "base")
+func (s *ConfigParserTestSuite) TestGet(c *C) {
+	val, err := s.cfg.Get("service", "base")
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "system-image.ubuntu.com")
+}
 
-	val, err = cfg.Get("foo", "bar")
+func (s *ConfigParserTestSuite) TestGetint(c *C) {
+	intval, err := s.cfg.Getint("service", "http_port")
+	c.Assert(err, IsNil)
+	c.Assert(intval, Equals, 80)
+}
+
+func (s *ConfigParserTestSuite) TestGetfloat(c *C) {
+	intval, err := s.cfg.Getfloat("foo", "float")
+	c.Assert(err, IsNil)
+	c.Assert(intval, Equals, 3.14)
+}
+
+func (s *ConfigParserTestSuite) TestGetbool(c *C) {
+	boolval, err := s.cfg.Getbool("foo", "yesbool")
+	c.Assert(err, IsNil)
+	c.Assert(boolval, Equals, true)
+
+	boolval, err = s.cfg.Getbool("foo", "nobool")
+	c.Assert(err, IsNil)
+	c.Assert(boolval, Equals, false)
+
+	boolval, err = s.cfg.Getbool("foo", "bar")
+	c.Assert(err.Error(), Equals, "No boolean: baz")
+}
+
+func (s *ConfigParserTestSuite) TestErrors(c *C) {
+	val, err := s.cfg.Get("foo", "bar")
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "baz")
 
-	val, err = cfg.Get("foo", "no-such-option")
+	val, err = s.cfg.Get("foo", "no-such-option")
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No option no-such-option in section foo")
 
-	val, err = cfg.Get("no-such-section", "no-such-value")
+	val, err = s.cfg.Get("no-such-section", "no-such-value")
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No section: no-such-section")
 }

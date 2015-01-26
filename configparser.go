@@ -2,28 +2,22 @@ package goconfigparser
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 // see python3 configparser.py
 var sectionRE = regexp.MustCompile(`\[(?P<header>[^]]+)\]`)
 var optionRE = regexp.MustCompile(`^(?P<option>.*?)\s*(?P<vi>[=|:])\s*(?P<value>.*)$`)
 
-type ConfigParser struct {
-	sections map[string]Section
-}
-
-type Section struct {
-	options map[string]string
-}
-
-func New() (cfg *ConfigParser) {
-	return &ConfigParser{
-		sections: make(map[string]Section)}
-}
+var booleanStates = map[string]bool{
+	"1": true, "yes": true, "true": true, "on": true,
+	"0": false, "no": false, "false": false, "off": false}
 
 type NoOptionError struct {
 	s string
@@ -39,6 +33,19 @@ type NoSectionError struct {
 
 func (e NoSectionError) Error() string {
 	return e.s
+}
+
+type ConfigParser struct {
+	sections map[string]Section
+}
+
+type Section struct {
+	options map[string]string
+}
+
+func New() (cfg *ConfigParser) {
+	return &ConfigParser{
+		sections: make(map[string]Section)}
 }
 
 func (c *ConfigParser) Read(r io.Reader) (err error) {
@@ -76,4 +83,34 @@ func (c *ConfigParser) Get(section, option string) (val string, err error) {
 	}
 
 	return sec.options[option], err
+}
+
+func (c *ConfigParser) Getint(section, option string) (val int, err error) {
+	sv, err := c.Get(section, option)
+	if err != nil {
+		return val, err
+	}
+	return strconv.Atoi(sv)
+}
+
+func (c *ConfigParser) Getfloat(section, option string) (val float64, err error) {
+	sv, err := c.Get(section, option)
+	if err != nil {
+		return val, err
+	}
+	return strconv.ParseFloat(sv, 64)
+}
+
+func (c *ConfigParser) Getbool(section, option string) (val bool, err error) {
+	sv, err := c.Get(section, option)
+	if err != nil {
+		return val, err
+	}
+
+	val, ok := booleanStates[strings.ToLower(sv)]
+	if !ok {
+		return val, errors.New(fmt.Sprintf("No boolean: %s", sv))
+	}
+
+	return val, err
 }
