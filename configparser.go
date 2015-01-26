@@ -1,3 +1,4 @@
+// A go implementation in the spirit of the python ConfigParser
 package goconfigparser
 
 import (
@@ -49,11 +50,13 @@ type Section struct {
 	options map[string]string
 }
 
+// Create a new empty ConfigParser
 func New() (cfg *ConfigParser) {
 	return &ConfigParser{
 		sections: make(map[string]Section)}
 }
 
+// Return a string slice of the sections available
 func (c *ConfigParser) Sections() (res []string) {
 	for k, _ := range c.sections {
 		res = append(res, k)
@@ -61,6 +64,7 @@ func (c *ConfigParser) Sections() (res []string) {
 	return res
 }
 
+// Return a string slice of the options available in the given section
 func (c *ConfigParser) Options(section string) (res []string, err error) {
 	sect, ok := c.sections[section]
 	if !ok {
@@ -72,6 +76,8 @@ func (c *ConfigParser) Options(section string) (res []string, err error) {
 	return res, err
 }
 
+// Attempt to parse the given io.Reader as a configuration
+// It may return a error if the reading fails
 func (c *ConfigParser) Read(r io.Reader) (err error) {
 	scanner := bufio.NewScanner(r)
 
@@ -96,6 +102,7 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 	return err
 }
 
+// Return the option for the given section as string or an error
 func (c *ConfigParser) Get(section, option string) (val string, err error) {
 	if _, ok := c.sections[section]; !ok {
 		return val, newNoSectionError(section)
@@ -109,6 +116,7 @@ func (c *ConfigParser) Get(section, option string) (val string, err error) {
 	return sec.options[option], err
 }
 
+// Return the option for the given section as integer or an error
 func (c *ConfigParser) Getint(section, option string) (val int, err error) {
 	sv, err := c.Get(section, option)
 	if err != nil {
@@ -117,6 +125,7 @@ func (c *ConfigParser) Getint(section, option string) (val int, err error) {
 	return strconv.Atoi(sv)
 }
 
+// Return the option for the given section as float or an error
 func (c *ConfigParser) Getfloat(section, option string) (val float64, err error) {
 	sv, err := c.Get(section, option)
 	if err != nil {
@@ -125,6 +134,7 @@ func (c *ConfigParser) Getfloat(section, option string) (val float64, err error)
 	return strconv.ParseFloat(sv, 64)
 }
 
+// Return the option for the given section as boolean or an error
 func (c *ConfigParser) Getbool(section, option string) (val bool, err error) {
 	sv, err := c.Get(section, option)
 	if err != nil {
