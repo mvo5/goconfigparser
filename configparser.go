@@ -26,6 +26,9 @@ type NoOptionError struct {
 func (e NoOptionError) Error() string {
 	return e.s
 }
+func newNoOptionError(section, option string) *NoOptionError {
+	return &NoOptionError{s: fmt.Sprintf("No option %s in section %s", option, section)}
+}
 
 type NoSectionError struct {
 	s string
@@ -33,6 +36,9 @@ type NoSectionError struct {
 
 func (e NoSectionError) Error() string {
 	return e.s
+}
+func newNoSectionError(section string) *NoSectionError {
+	return &NoSectionError{s: fmt.Sprintf("No section: %s", section)}
 }
 
 type ConfigParser struct {
@@ -46,6 +52,24 @@ type Section struct {
 func New() (cfg *ConfigParser) {
 	return &ConfigParser{
 		sections: make(map[string]Section)}
+}
+
+func (c *ConfigParser) Sections() (res []string) {
+	for k, _ := range c.sections {
+		res = append(res, k)
+	}
+	return res
+}
+
+func (c *ConfigParser) Options(section string) (res []string, err error) {
+	sect, ok := c.sections[section]
+	if !ok {
+		return res, newNoSectionError(section)
+	}
+	for k, _ := range sect.options {
+		res = append(res, k)
+	}
+	return res, err
 }
 
 func (c *ConfigParser) Read(r io.Reader) (err error) {
@@ -74,12 +98,12 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 
 func (c *ConfigParser) Get(section, option string) (val string, err error) {
 	if _, ok := c.sections[section]; !ok {
-		return val, NoSectionError{s: fmt.Sprintf("No section: %s", section)}
+		return val, newNoSectionError(section)
 	}
 	sec := c.sections[section]
 
 	if _, ok := sec.options[option]; !ok {
-		return val, NoOptionError{s: fmt.Sprintf("No option %s in section %s", option, section)}
+		return val, newNoOptionError(section, option)
 	}
 
 	return sec.options[option], err

@@ -1,6 +1,7 @@
 package goconfigparser
 
 import (
+	"sort"
 	"strings"
 	"testing"
 
@@ -32,6 +33,10 @@ bar: baz
 yesbool: On
 nobool: off
 float: 3.14
+
+[testOptions]
+One: 1
+Two: 2
 `
 
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
@@ -39,6 +44,19 @@ func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 	c.Assert(s.cfg, NotNil)
 	err := s.cfg.Read(strings.NewReader(SAMPLE_INI))
 	c.Assert(err, IsNil)
+}
+
+func (s *ConfigParserTestSuite) TestSection(c *C) {
+	sections := s.cfg.Sections()
+	sort.Strings(sections)
+	c.Assert(sections, DeepEquals, []string{"foo", "service", "testOptions"})
+}
+
+func (s *ConfigParserTestSuite) TestOptions(c *C) {
+	options, err := s.cfg.Options("testOptions")
+	c.Assert(err, IsNil)
+	sort.Strings(options)
+	c.Assert(options, DeepEquals, []string{"One", "Two"})
 }
 
 func (s *ConfigParserTestSuite) TestGet(c *C) {
