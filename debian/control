@@ -1,0 +1,22 @@
+Source: golang-goconfigparser
+Section: devel
+Priority: extra
+Maintainer: Sergio Schvezov <sergio.schvezov@canonical.com>
+Build-Depends:
+ debhelper (>= 9),
+ dh-golang,
+ golang-go,
+ golang-gocheck-dev,
+Standards-Version: 3.9.6
+Homepage: http://github.com/mvo5/goconfigparser
+Vcs-Browser: http://github.com/mvo5/goconfigparser
+
+Package: golang-goconfigparser-dev
+Architecture: all
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Python compatible INI parser
+ This parser is build as a go equivalent of the Python ConfigParser
+ module and is aimed for maximum compatibility for both the file format
+ and the API. This should make it easy to use existing python style
+ configuration files from go and also ease the porting of existing
+ python code.

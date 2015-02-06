@@ -1,0 +1,5 @@
+golang-goconfigparser (0~gitfadf381f52-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Initial release.
+
+ -- Sergio Schvezov <sergio.schvezov@canonical.com>  Fri, 06 Feb 2015 02:44:16 -0200
