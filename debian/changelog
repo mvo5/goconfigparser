@@ -1,5 +1,8 @@
-golang-goconfigparser (0~gite414761625e-0ubuntu1) UNRELEASED; urgency=medium
+golang-goconfigparser (0~gite414761625e-0ubuntu1~1.gbp9aae04) vivid; urgency=medium
 
+  ** SNAPSHOT build @9aae047777c033258cc7dc1378332db09ecf68ef **
+
+  [ Sergio Schvezov ]
   * Initial release.
 
- -- Sergio Schvezov <sergio.schvezov@canonical.com>  Fri, 06 Feb 2015 02:44:16 -0200
+ -- Michael Vogt <mvo@ubuntu.com>  Fri, 06 Feb 2015 09:56:53 +0100
