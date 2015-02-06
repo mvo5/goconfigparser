@@ -1,17 +1,13 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: go-dbus
-Source: https://launchpad.net/go-dbus
-Comment:
- The source code was forked from https://github.com/papamitra/go-dbus
- and stated as abandoned by the new upstream author.
+Upstream-Name: goconfigparser
+Source: https://github.com/mvo5/goconfigparser
 
 Files: *
-Copyright: 2009 papamitra <papamitra@gmail.com>
-           2013-2014 Canonical, Ltd.
+Copyright: 2014 Canonical
 License: MIT
 
 Files: debian/*
-Copyright: 2014 Canonical, Ltd.
+Copyright: 2014 Canonical
 License: MIT
 
 License: MIT
