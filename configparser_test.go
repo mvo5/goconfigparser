@@ -1,6 +1,7 @@
 package goconfigparser
 
 import (
+	"io/ioutil"
 	"sort"
 	"strings"
 	"testing"
@@ -42,7 +43,7 @@ Two: 2
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 	s.cfg = New()
 	c.Assert(s.cfg, NotNil)
-	err := s.cfg.Read(strings.NewReader(SAMPLE_INI))
+	err := s.cfg.ReadString(SAMPLE_INI)
 	c.Assert(err, IsNil)
 }
 
@@ -102,4 +103,25 @@ func (s *ConfigParserTestSuite) TestErrors(c *C) {
 	val, err = s.cfg.Get("no-such-section", "no-such-value")
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No section: no-such-section")
+}
+
+func (s *ConfigParserTestSuite) TestAllowNoSection(c *C) {
+	s.cfg = New()
+	s.cfg.AllowNoSectionHeader = true
+	err := s.cfg.Read(strings.NewReader(`foo=bar`))
+	c.Assert(err, IsNil)
+	val, err := s.cfg.Get("", "foo")
+	c.Assert(val, Equals, "bar")
+}
+
+func (s *ConfigParserTestSuite) TestReadFile(c *C) {
+	tmp, err := ioutil.TempFile("", "")
+	c.Assert(err, IsNil)
+	tmp.Write([]byte(SAMPLE_INI))
+
+	s.cfg = New()
+	err = s.cfg.ReadFile(tmp.Name())
+	c.Assert(err, IsNil)
+	val, err := s.cfg.Get("foo", "bar")
+	c.Assert(val, Equals, "baz")
 }
