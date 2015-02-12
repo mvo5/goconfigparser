@@ -43,7 +43,10 @@ func newNoSectionError(section string) *NoSectionError {
 }
 
 type ConfigParser struct {
-	sections map[string]Section
+	sections         map[string]Section
+
+	// allow data with no ["section"] header via Get("", key)
+	AllowNoSectionHeader bool
 }
 
 type Section struct {
@@ -82,6 +85,13 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 	scanner := bufio.NewScanner(r)
 
 	curSect := ""
+	// we allow files with no [section] header in this mode, by
+	// default its a error to be alinged with what python configparser
+	// is doing
+	if c.AllowNoSectionHeader {
+		c.sections[""] = Section{
+			options: make(map[string]string)}
+	}
 	for scanner.Scan() {
 		line := scanner.Text()
 		if sectionRE.MatchString(line) {
@@ -93,6 +103,9 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 			matches := optionRE.FindStringSubmatch(line)
 			key := matches[1]
 			value := matches[3]
+			if _, ok := c.sections[curSect]; !ok {
+				return newNoSectionError(curSect)
+			}
 			c.sections[curSect].options[key] = value
 		}
 	}

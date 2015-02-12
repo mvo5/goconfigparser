@@ -103,3 +103,12 @@ func (s *ConfigParserTestSuite) TestErrors(c *C) {
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No section: no-such-section")
 }
+
+func (s *ConfigParserTestSuite) TestAllowNoSection(c *C) {
+	s.cfg = New()
+	s.cfg.AllowNoSectionHeader = true
+	err := s.cfg.Read(strings.NewReader(`foo=bar`))
+	c.Assert(err, IsNil)
+	val, err := s.cfg.Get("", "foo")
+	c.Assert(val, Equals, "bar")
+}
