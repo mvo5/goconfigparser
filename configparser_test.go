@@ -42,7 +42,7 @@ Two: 2
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 	s.cfg = New()
 	c.Assert(s.cfg, NotNil)
-	err := s.cfg.Read(strings.NewReader(SAMPLE_INI))
+	err := s.cfg.ReadString(SAMPLE_INI)
 	c.Assert(err, IsNil)
 }
 

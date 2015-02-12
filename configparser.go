@@ -43,7 +43,7 @@ func newNoSectionError(section string) *NoSectionError {
 }
 
 type ConfigParser struct {
-	sections         map[string]Section
+	sections map[string]Section
 
 	// allow data with no ["section"] header via Get("", key)
 	AllowNoSectionHeader bool
@@ -77,6 +77,13 @@ func (c *ConfigParser) Options(section string) (res []string, err error) {
 		res = append(res, k)
 	}
 	return res, err
+}
+
+// Attempt to parse the given string as a configuration
+// It may return a error if the parsing fails
+func (c *ConfigParser) ReadString(s string) (err error) {
+	r := strings.NewReader(s)
+	return c.Read(r)
 }
 
 // Attempt to parse the given io.Reader as a configuration
