@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -84,6 +85,16 @@ func (c *ConfigParser) Options(section string) (res []string, err error) {
 func (c *ConfigParser) ReadString(s string) (err error) {
 	r := strings.NewReader(s)
 	return c.Read(r)
+}
+
+// Attempt to parse the given file as a configuration
+// It may return a error if the parsing fails
+func (c *ConfigParser) ReadFile(path string) (err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	return c.Read(f)
 }
 
 // Attempt to parse the given io.Reader as a configuration

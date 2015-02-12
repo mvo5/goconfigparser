@@ -1,6 +1,7 @@
 package goconfigparser
 
 import (
+	"io/ioutil"
 	"sort"
 	"strings"
 	"testing"
@@ -111,4 +112,16 @@ func (s *ConfigParserTestSuite) TestAllowNoSection(c *C) {
 	c.Assert(err, IsNil)
 	val, err := s.cfg.Get("", "foo")
 	c.Assert(val, Equals, "bar")
+}
+
+func (s *ConfigParserTestSuite) TestReadFile(c *C) {
+	tmp, err := ioutil.TempFile("", "")
+	c.Assert(err, IsNil)
+	tmp.Write([]byte(SAMPLE_INI))
+
+	s.cfg = New()
+	err = s.cfg.ReadFile(tmp.Name())
+	c.Assert(err, IsNil)
+	val, err := s.cfg.Get("foo", "bar")
+	c.Assert(val, Equals, "baz")
 }
