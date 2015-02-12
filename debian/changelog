@@ -1,3 +1,9 @@
+golang-goconfigparser (0~1.git096a5e829) vivid; urgency=low
+
+  * new snapshot
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 12 Feb 2015 16:35:44 +0100
+
 golang-goconfigparser (0~gite9aae047777c0) vivid; urgency=medium
 
   * Initial release.
