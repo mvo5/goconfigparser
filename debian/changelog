@@ -1,3 +1,11 @@
+golang-github-mvo5-goconfigparser (0.2-0ubuntu3) xenial; urgency=medium
+
+  * rename source package to golang-github-mvo5-goconfigparser to
+    conform with the debian packaging convention
+  * fix incorrect Maintainer line
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 03 Mar 2016 10:02:57 +0100
+
 golang-goconfigparser (0.2-0ubuntu2) xenial; urgency=medium
 
   * rename binary package to golang-github-mvo5-goconfigparser-dev
