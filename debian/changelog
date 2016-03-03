@@ -1,3 +1,11 @@
+golang-goconfigparser (0.2-0ubuntu2) xenial; urgency=medium
+
+  * rename binary package to golang-github-mvo5-goconfigparser-dev
+    to follow http://pkg-go.alioth.debian.org/packaging.html
+    naming convention
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 25 Feb 2016 17:25:22 +0100
+
 golang-goconfigparser (0.2-0ubuntu1) vivid; urgency=low
 
   * initial archive upload based on version 0.2

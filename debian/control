@@ -11,7 +11,7 @@ Standards-Version: 3.9.6
 Homepage: http://github.com/mvo5/goconfigparser
 Vcs-Browser: http://github.com/mvo5/goconfigparser
 
-Package: golang-goconfigparser-dev
+Package: golang-github-mvo5-goconfigparser-dev
 Architecture: all
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Python compatible INI parser
