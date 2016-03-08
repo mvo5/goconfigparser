@@ -1,3 +1,9 @@
+golang-github-mvo5-goconfigparser (0.2-0ubuntu4) xenial; urgency=medium
+
+  * update build-depends to golang-check.v1-dev (thanks Mike Terry!)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Tue, 08 Mar 2016 15:08:12 +0100
+
 golang-github-mvo5-goconfigparser (0.2-0ubuntu3) xenial; urgency=medium
 
   * rename source package to golang-github-mvo5-goconfigparser to

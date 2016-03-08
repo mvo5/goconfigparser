@@ -7,7 +7,7 @@ Build-Depends:
  debhelper (>= 9),
  dh-golang,
  golang-go,
- golang-gocheck-dev,
+ golang-check.v1-dev,
 Standards-Version: 3.9.6
 Homepage: http://github.com/mvo5/goconfigparser
 Vcs-Browser: http://github.com/mvo5/goconfigparser
