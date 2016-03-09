@@ -1,3 +1,4 @@
+[![Build Status][travis-image]][travis-url] 
 Config File Parser (INI style)
 ==============================
 
@@ -16,3 +17,6 @@ Current Limitations:
  * no defaults
  * no write support
  * not all API is provided
+
+[travis-image]: https://travis-ci.org/mvo5/goconfigparser.svg?branch=master
+[travis-url]: https://travis-ci.org/mvo5/goconfigparser
