@@ -1,3 +1,10 @@
+golang-github-mvo5-goconfigparser (0.2-0ubuntu5) xenial; urgency=medium
+
+  * add missing breaks/replaces for clean upgrades from the previous
+    binary package name "golang-goconfigparser-dev"
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 09 Mar 2016 09:15:04 +0100
+
 golang-github-mvo5-goconfigparser (0.2-0ubuntu4) xenial; urgency=medium
 
   * update build-depends to golang-check.v1-dev (thanks Mike Terry!)

@@ -15,6 +15,8 @@ Vcs-Browser: http://github.com/mvo5/goconfigparser
 Package: golang-github-mvo5-goconfigparser-dev
 Architecture: all
 Depends: ${misc:Depends}, ${shlibs:Depends}
+Replaces: golang-goconfigparser-dev (<< 0.2-0ubuntu3~)
+Breaks: golang-goconfigparser-dev (<< 0.2-0ubuntu3~)
 Description: Python compatible INI parser
  This parser is build as a go equivalent of the Python ConfigParser
  module and is aimed for maximum compatibility for both the file format
