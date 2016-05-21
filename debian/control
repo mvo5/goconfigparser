@@ -7,7 +7,7 @@ Build-Depends:
  dh-golang,
  golang-go,
  golang-check.v1-dev,
-Standards-Version: 3.9.6
+Standards-Version: 3.9.7
 Homepage: http://github.com/mvo5/goconfigparser
 Vcs-Browser: http://github.com/mvo5/goconfigparser
 
