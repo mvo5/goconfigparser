@@ -2,6 +2,8 @@ golang-github-mvo5-goconfigparser (0.2.1-1) UNRELEASED; urgency=medium
 
   * Initial Debian upload.
   * Update Standards-Version.
+  * Point Vcs-Browser at my copy of the Debian packaging and use https:
+    instead of http.
 
  -- Steve Langasek <vorlon@debian.org>  Sat, 21 May 2016 13:39:22 -0700
 

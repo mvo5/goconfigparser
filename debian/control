@@ -9,7 +9,8 @@ Build-Depends:
  golang-check.v1-dev,
 Standards-Version: 3.9.7
 Homepage: http://github.com/mvo5/goconfigparser
-Vcs-Browser: http://github.com/mvo5/goconfigparser
+Vcs-Browser: https://github.com/vorlonofportland/goconfigparser/tree/debian
+Vcs-Git: https://github.com/vorlonofportland/goconfigparser -b debian
 
 Package: golang-github-mvo5-goconfigparser-dev
 Architecture: all
