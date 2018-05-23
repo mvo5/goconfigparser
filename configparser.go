@@ -121,6 +121,7 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 			matches := optionRE.FindStringSubmatch(line)
 			key := matches[1]
 			value := matches[3]
+			value = strings.Replace(value, "%%", "%", -1)
 			if _, ok := c.sections[curSect]; !ok {
 				return newNoSectionError(curSect)
 			}
