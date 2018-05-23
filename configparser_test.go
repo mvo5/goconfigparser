@@ -34,6 +34,7 @@ bar: baz
 yesbool: On
 nobool: off
 float: 3.14
+no_interpolation: %%no
 
 [testOptions]
 One: 1
@@ -65,6 +66,13 @@ func (s *ConfigParserTestSuite) TestGet(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "system-image.ubuntu.com")
 }
+
+func (s *ConfigParserTestSuite) TestGetEscapeInterpolation(c *C) {
+	val, err := s.cfg.Get("foo", "no_interpolation")
+	c.Assert(err, IsNil)
+	c.Assert(val, Equals, "%no")
+}
+
 
 func (s *ConfigParserTestSuite) TestGetint(c *C) {
 	intval, err := s.cfg.Getint("service", "http_port")
