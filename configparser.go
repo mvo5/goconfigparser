@@ -16,6 +16,7 @@ import (
 // see python3 configparser.py
 var sectionRE = regexp.MustCompile(`\[(?P<header>[^]]+)\]`)
 var optionRE = regexp.MustCompile(`^(?P<option>.*?)\s*(?P<vi>[=|:])\s*(?P<value>.*)$`)
+var commentRE = regexp.MustCompile(`^\s*[#;].*$`)
 
 var booleanStates = map[string]bool{
 	"1": true, "yes": true, "true": true, "on": true,
@@ -104,7 +105,7 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 
 	curSect := ""
 	// we allow files with no [section] header in this mode, by
-	// default its a error to be alinged with what python configparser
+	// default its a error to be aligned with what python configparser
 	// is doing
 	if c.AllowNoSectionHeader {
 		c.sections[""] = Section{
@@ -112,7 +113,9 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 	}
 	for scanner.Scan() {
 		line := scanner.Text()
-		if sectionRE.MatchString(line) {
+		if commentRE.MatchString(line) {
+			// Do nothing
+		} else if sectionRE.MatchString(line) {
 			matches := sectionRE.FindStringSubmatch(line)
 			curSect = matches[1]
 			c.sections[curSect] = Section{

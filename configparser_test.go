@@ -20,6 +20,9 @@ type ConfigParserTestSuite struct {
 var _ = Suite(&ConfigParserTestSuite{})
 
 const SAMPLE_INI = `
+# comment: text
+  ; indented_comment: text
+
 [service]
 base: system-image.ubuntu.com
 http_port: 80
