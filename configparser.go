@@ -44,6 +44,17 @@ func newNoSectionError(section string) *NoSectionError {
 	return &NoSectionError{s: fmt.Sprintf("No section: %s", section)}
 }
 
+type DuplicateSectionError struct {
+	s string
+}
+
+func (e DuplicateSectionError) Error() string {
+	return e.s
+}
+func newDuplicateSectionError(section string) *DuplicateSectionError {
+	return &DuplicateSectionError{s: fmt.Sprintf("Section %q already exists", section)}
+}
+
 type ConfigParser struct {
 	sections map[string]Section
 
@@ -182,4 +193,120 @@ func (c *ConfigParser) Getbool(section, option string) (val bool, err error) {
 	}
 
 	return val, err
+}
+
+// Add the section or return an error if it already exists
+func (c *ConfigParser) AddSection(section string) error {
+	if c.HasSection(section) {
+		return newDuplicateSectionError(section)
+	}
+
+	c.sections[section] = Section{options: map[string]string{}}
+
+	return nil
+}
+
+// Return whether the named section is present in the configuration
+func (c *ConfigParser) HasSection(section string) bool {
+	_, ok := c.sections[section]
+	return ok
+}
+
+// Return whether the named option is present in the configuration
+func (c *ConfigParser) HasOption(section, option string) bool {
+	sect, ok := c.sections[section]
+	if !ok {
+		return false
+	}
+	_, ok = sect.options[option]
+
+	return ok
+}
+
+// Set the given option to the specified value or return an error if the
+// section doesn't exist
+func (c *ConfigParser) Set(section, option, value string) error {
+	if !c.HasSection(section) {
+		if c.AllowNoSectionHeader && section == "" {
+			c.sections[""] = Section{options: map[string]string{}}
+		} else {
+			return newNoSectionError(section)
+		}
+	}
+
+	c.sections[section].options[option] = value
+
+	return nil
+}
+
+// A convenience function to write the current configuration to a file,
+// optionally using spaces around delimiters. This call is not present in
+// the Python ConfigParser.
+func (c *ConfigParser) WriteFile(path string, spaceAroundDelimiters bool, mode os.FileMode) error {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
+	if err != nil {
+		return err
+	}
+	if err := c.Write(f, spaceAroundDelimiters); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Close()
+}
+
+// Write the current configuration, optionally using spaces around delimiters
+func (c *ConfigParser) Write(w io.Writer, spaceAroundDelimiters bool) error {
+	writeOptions := func(options map[string]string) {
+		for option, value := range options {
+			if spaceAroundDelimiters {
+				fmt.Fprintf(w, "%s = %s\n", option, value)
+			} else {
+				fmt.Fprintf(w, "%s=%s\n", option, value)
+			}
+		}
+		fmt.Fprintf(w, "\n")
+	}
+
+	// write options with no [section] header first, if we allow it
+	if c.AllowNoSectionHeader && c.HasSection("") {
+		writeOptions(c.sections[""].options)
+	}
+
+	for name, section := range c.sections {
+		if c.AllowNoSectionHeader && name == "" {
+			continue
+		}
+		fmt.Fprintf(w, "[%s]\n", name)
+		writeOptions(section.options)
+	}
+
+	return nil
+}
+
+// Remove the given option from the specified section or return an error if
+// the section or option doesn't exist
+func (c *ConfigParser) RemoveOption(section, option string) error {
+	sect, ok := c.sections[section]
+	if !ok {
+		return newNoSectionError(section)
+	}
+	if _, ok := sect.options[option]; !ok {
+		return newNoOptionError(section, option)
+	}
+
+	delete(sect.options, option)
+
+	return nil
+}
+
+// Remove the given section from the configuration or return an error if
+// the section doesn't exist
+func (c *ConfigParser) RemoveSection(section string) error {
+	if !c.HasSection(section) {
+		return newNoSectionError(section)
+	}
+
+	delete(c.sections, section)
+
+	return nil
 }

@@ -46,7 +46,6 @@ Current Limitations:
 --------------------
  * no interpolation
  * no defaults
- * no write support
  * not all API is provided
 
 [travis-image]: https://travis-ci.org/mvo5/goconfigparser.svg?branch=master
