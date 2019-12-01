@@ -1,7 +1,9 @@
 package goconfigparser
 
 import (
+	"bytes"
 	"io/ioutil"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -76,7 +78,6 @@ func (s *ConfigParserTestSuite) TestGetEscapeInterpolation(c *C) {
 	c.Assert(val, Equals, "%no")
 }
 
-
 func (s *ConfigParserTestSuite) TestGetint(c *C) {
 	intval, err := s.cfg.Getint("service", "http_port")
 	c.Assert(err, IsNil)
@@ -135,4 +136,92 @@ func (s *ConfigParserTestSuite) TestReadFile(c *C) {
 	c.Assert(err, IsNil)
 	val, err := s.cfg.Get("foo", "bar")
 	c.Assert(val, Equals, "baz")
+}
+
+func (s *ConfigParserTestSuite) TestAddSection(c *C) {
+	c.Assert(s.cfg.AddSection("new-section"), IsNil)
+	c.Assert(s.cfg.AddSection("foo"), ErrorMatches, `Section "foo" already exists`)
+	_, ok := s.cfg.sections["new-section"]
+	c.Assert(ok, Equals, true)
+}
+
+func (s *ConfigParserTestSuite) TestHasSection(c *C) {
+	c.Assert(s.cfg.HasSection("foo"), Equals, true)
+	c.Assert(s.cfg.HasSection("does-not-exist"), Equals, false)
+}
+
+func (s *ConfigParserTestSuite) TestHasOption(c *C) {
+	c.Assert(s.cfg.HasOption("foo", "bar"), Equals, true)
+	c.Assert(s.cfg.HasOption("foo", "does-not-exist"), Equals, false)
+	c.Assert(s.cfg.HasOption("does-not-exist", "bar"), Equals, false)
+	c.Assert(s.cfg.HasOption("does-not-exist", "does-not-exist"), Equals, false)
+}
+
+func (s *ConfigParserTestSuite) TestHasOptionNoSection(c *C) {
+	cfg := New()
+	cfg.AllowNoSectionHeader = true
+	err := cfg.Read(strings.NewReader("one=1"))
+	c.Assert(err, IsNil)
+	c.Assert(cfg.HasOption("", "one"), Equals, true)
+	c.Assert(cfg.HasOption("", "two"), Equals, false)
+	c.Assert(cfg.HasOption("foo", "one"), Equals, false)
+	c.Assert(cfg.HasOption("foo", "two"), Equals, false)
+}
+
+func (s *ConfigParserTestSuite) TestSet(c *C) {
+	c.Assert(s.cfg.Set("foo", "one", "1"), IsNil)
+	c.Assert(s.cfg.sections["foo"].options["one"], Equals, "1")
+	c.Assert(s.cfg.Set("does-not-exist", "one", "1"), ErrorMatches, "No section: does-not-exist")
+}
+
+func (s *ConfigParserTestSuite) TestWrite(c *C) {
+	for i, tc := range []struct {
+		spaces    bool
+		noSection bool
+		result    string
+	}{
+		{false, false, "[foo]\none=1\n\n"},
+		{false, true, "one=1\n\n"},
+		{true, false, "[foo]\none = 1\n\n"},
+		{true, true, "one = 1\n\n"},
+	} {
+		c.Logf("%d: %v %v", i, tc.spaces, tc.noSection)
+		cfg := New()
+		sect := ""
+		cfg.AllowNoSectionHeader = tc.noSection
+		if !tc.noSection {
+			sect = "foo"
+			c.Assert(cfg.AddSection(sect), IsNil)
+		}
+		var b bytes.Buffer
+		c.Assert(cfg.Set(sect, "one", "1"), IsNil)
+		c.Assert(cfg.Write(&b, tc.spaces), IsNil)
+		c.Assert(b.String(), Equals, tc.result)
+	}
+}
+
+func (s *ConfigParserTestSuite) TestWriteFile(c *C) {
+	filename := filepath.Join(c.MkDir(), "test.ini")
+	cfg := New()
+	c.Assert(cfg.AddSection("foo"), IsNil)
+	c.Assert(cfg.Set("foo", "one", "1"), IsNil)
+	c.Assert(cfg.WriteFile(filename, false, 0644), IsNil)
+	data, err := ioutil.ReadFile(filename)
+	c.Assert(err, IsNil)
+	c.Assert(string(data), Equals, "[foo]\none=1\n\n")
+}
+
+func (s *ConfigParserTestSuite) TestRemoveOption(c *C) {
+	c.Assert(s.cfg.RemoveOption("foo", "does-not-exist"), ErrorMatches, "No option does-not-exist in section foo")
+	c.Assert(s.cfg.RemoveOption("does-not-exist", "bar"), ErrorMatches, "No section: does-not-exist")
+	c.Assert(s.cfg.HasOption("foo", "bar"), Equals, true)
+	c.Assert(s.cfg.RemoveOption("foo", "bar"), Equals, nil)
+	c.Assert(s.cfg.HasOption("foo", "bar"), Equals, false)
+}
+
+func (s *ConfigParserTestSuite) TestRemoveSection(c *C) {
+	c.Assert(s.cfg.RemoveSection("does-not-exist"), ErrorMatches, "No section: does-not-exist")
+	c.Assert(s.cfg.HasSection("foo"), Equals, true)
+	c.Assert(s.cfg.RemoveSection("foo"), Equals, nil)
+	c.Assert(s.cfg.HasSection("foo"), Equals, false)
 }
