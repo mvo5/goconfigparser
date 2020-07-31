@@ -42,6 +42,10 @@ no_interpolation: %%no
 [testOptions]
 One: 1
 Two: 2
+
+[complex]
+json_object: {"list":["foo","bar","with\nnewline"]}
+json_list: ["foo","bar","with\nnewline"]
 `
 
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
@@ -54,7 +58,7 @@ func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 func (s *ConfigParserTestSuite) TestSection(c *C) {
 	sections := s.cfg.Sections()
 	sort.Strings(sections)
-	c.Assert(sections, DeepEquals, []string{"foo", "service", "testOptions"})
+	c.Assert(sections, DeepEquals, []string{"complex", "foo", "service", "testOptions"})
 }
 
 func (s *ConfigParserTestSuite) TestOptions(c *C) {
@@ -75,7 +79,6 @@ func (s *ConfigParserTestSuite) TestGetEscapeInterpolation(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "%no")
 }
-
 
 func (s *ConfigParserTestSuite) TestGetint(c *C) {
 	intval, err := s.cfg.Getint("service", "http_port")
@@ -135,4 +138,14 @@ func (s *ConfigParserTestSuite) TestReadFile(c *C) {
 	c.Assert(err, IsNil)
 	val, err := s.cfg.Get("foo", "bar")
 	c.Assert(val, Equals, "baz")
+}
+
+func (s *ConfigParserTestSuite) TestGetComplex(c *C) {
+	val, err := s.cfg.Get("complex", "json_object")
+	c.Assert(err, IsNil)
+	c.Assert(val, Equals, `{"list":["foo","bar","with\nnewline"]}`)
+
+	val, err = s.cfg.Get("complex", "json_list")
+	c.Assert(err, IsNil)
+	c.Assert(val, Equals, `["foo","bar","with\nnewline"]`)
 }
