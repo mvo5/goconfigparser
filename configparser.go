@@ -14,7 +14,7 @@ import (
 )
 
 // see python3 configparser.py
-var sectionRE = regexp.MustCompile(`\[(?P<header>[^]]+)\]`)
+var sectionRE = regexp.MustCompile(`^\[(?P<header>[^]]+)\]`)
 var optionRE = regexp.MustCompile(`^(?P<option>.*?)\s*(?P<vi>[=|:])\s*(?P<value>.*)$`)
 var commentRE = regexp.MustCompile(`^\s*[#;].*$`)
 
