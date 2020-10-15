@@ -1,7 +1,7 @@
 Source: golang-github-mvo5-goconfigparser
 Section: devel
 Priority: extra
-Maintainer: Steve Langasek <vorlon@debian.org>
+Maintainer: Steve Langasek <vorlon@debian.org>, Michael Vogt <michael.vogt@ubuntu.com>
 Build-Depends:
  debhelper (>= 9),
  dh-golang,
