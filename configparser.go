@@ -192,7 +192,7 @@ func (c *ConfigParser) Getbool(section, option string) (val bool, err error) {
 
 	val, ok := booleanStates[strings.ToLower(sv)]
 	if !ok {
-		return val, fmt.Errorf("No boolean: %s", sv)
+		return val, fmt.Errorf("option %s/%s is not a boolean: %s", section, option, sv)
 	}
 
 	return val, err

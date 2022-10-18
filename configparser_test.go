@@ -116,7 +116,7 @@ func (s *ConfigParserTestSuite) TestGetbool(c *C) {
 	c.Assert(boolval, Equals, false)
 
 	boolval, err = s.cfg.Getbool("foo", "bar")
-	c.Assert(err.Error(), Equals, "No boolean: baz")
+	c.Assert(err.Error(), Equals, "option foo/bar is not a boolean: baz")
 }
 
 func (s *ConfigParserTestSuite) TestErrors(c *C) {
