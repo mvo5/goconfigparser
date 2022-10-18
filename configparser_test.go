@@ -115,8 +115,8 @@ func (s *ConfigParserTestSuite) TestGetbool(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(boolval, Equals, false)
 
-	boolval, err = s.cfg.Getbool("foo", "bar")
-	c.Assert(err.Error(), Equals, "No boolean: baz")
+	_, err = s.cfg.Getbool("foo", "bar")
+	c.Assert(err.Error(), Equals, "option foo/bar is not a boolean: baz")
 }
 
 func (s *ConfigParserTestSuite) TestErrors(c *C) {
@@ -124,11 +124,11 @@ func (s *ConfigParserTestSuite) TestErrors(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "baz")
 
-	val, err = s.cfg.Get("foo", "no-such-option")
+	_, err = s.cfg.Get("foo", "no-such-option")
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No option no-such-option in section foo")
 
-	val, err = s.cfg.Get("no-such-section", "no-such-value")
+	_, err = s.cfg.Get("no-such-section", "no-such-value")
 	c.Assert(err, NotNil)
 	c.Assert(err.Error(), Equals, "No section: no-such-section")
 }
@@ -139,6 +139,7 @@ func (s *ConfigParserTestSuite) TestAllowNoSection(c *C) {
 	err := s.cfg.Read(strings.NewReader(`foo=bar`))
 	c.Assert(err, IsNil)
 	val, err := s.cfg.Get("", "foo")
+	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "bar")
 }
 
@@ -151,6 +152,7 @@ func (s *ConfigParserTestSuite) TestReadFile(c *C) {
 	err = s.cfg.ReadFile(tmp.Name())
 	c.Assert(err, IsNil)
 	val, err := s.cfg.Get("foo", "bar")
+	c.Assert(err, IsNil)
 	c.Assert(val, Equals, "baz")
 }
 

@@ -3,7 +3,6 @@ package goconfigparser
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -63,7 +62,7 @@ func New() (cfg *ConfigParser) {
 
 // Return a string slice of the sections available
 func (c *ConfigParser) Sections() (res []string) {
-	for k, _ := range c.sections {
+	for k := range c.sections {
 		res = append(res, k)
 	}
 	return res
@@ -75,7 +74,7 @@ func (c *ConfigParser) Options(section string) (res []string, err error) {
 	if !ok {
 		return res, newNoSectionError(section)
 	}
-	for k, _ := range sect.options {
+	for k := range sect.options {
 		res = append(res, k)
 	}
 	return res, err
@@ -193,7 +192,7 @@ func (c *ConfigParser) Getbool(section, option string) (val bool, err error) {
 
 	val, ok := booleanStates[strings.ToLower(sv)]
 	if !ok {
-		return val, errors.New(fmt.Sprintf("No boolean: %s", sv))
+		return val, fmt.Errorf("option %s/%s is not a boolean: %s", section, option, sv)
 	}
 
 	return val, err
