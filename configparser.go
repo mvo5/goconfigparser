@@ -52,7 +52,7 @@ type ConfigParser struct {
 }
 
 type Section struct {
-	options map[string]string
+	options map[string][]string
 }
 
 // Create a new empty ConfigParser
@@ -109,26 +109,41 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 	// is doing
 	if c.AllowNoSectionHeader {
 		c.sections[""] = Section{
-			options: make(map[string]string)}
+			options: make(map[string][]string)}
 	}
+	indentLevel := 0
+	curOption := ""
 	for scanner.Scan() {
 		line := scanner.Text()
 		if commentRE.MatchString(line) {
 			// Do nothing
-		} else if sectionRE.MatchString(line) {
-			matches := sectionRE.FindStringSubmatch(line)
-			curSect = matches[1]
-			c.sections[curSect] = Section{
-				options: make(map[string]string)}
-		} else if optionRE.MatchString(line) {
-			matches := optionRE.FindStringSubmatch(line)
-			key := matches[1]
-			value := matches[3]
-			value = strings.Replace(value, "%%", "%", -1)
-			if _, ok := c.sections[curSect]; !ok {
-				return newNoSectionError(curSect)
+		} else {
+			cur_indent_level := len(line) - len(strings.TrimLeft(line, " "))
+			if curSect != "" && curOption != "" && cur_indent_level > indentLevel {
+				c.sections[curSect].options[curOption] = append(c.sections[curSect].options[curOption],
+					strings.TrimSpace(line))
+				// a section header or option header?
+			} else if sectionRE.MatchString(line) {
+				indentLevel = cur_indent_level
+				matches := sectionRE.FindStringSubmatch(line)
+				curSect = matches[1]
+				curOption = ""
+				c.sections[curSect] = Section{
+					options: make(map[string][]string)}
+			} else if optionRE.MatchString(line) {
+				matches := optionRE.FindStringSubmatch(line)
+				key := matches[1]
+				value := matches[3]
+				value = strings.Replace(value, "%%", "%", -1)
+				if _, ok := c.sections[curSect]; !ok {
+					return newNoSectionError(curSect)
+				}
+				// in case of continuation line, value could be empty
+				if value != "" {
+					c.sections[curSect].options[key] = append(c.sections[curSect].options[key], value)
+				}
+				curOption = key
 			}
-			c.sections[curSect].options[key] = value
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -148,7 +163,7 @@ func (c *ConfigParser) Get(section, option string) (val string, err error) {
 		return val, newNoOptionError(section, option)
 	}
 
-	return sec.options[option], err
+	return strings.Join(sec.options[option], "\n"), err
 }
 
 // Return the option for the given section as integer or an error

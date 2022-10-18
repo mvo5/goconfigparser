@@ -46,6 +46,20 @@ Two: 2
 [complex]
 json_object: {"list":["foo","bar","with\nnewline"]}
 json_list: ["foo","bar","with\nnewline"]
+
+[multiline]
+install_requires=
+    pkginfo >= 1.8.1
+    readme-renderer >= 35.0
+    requests >= 2.20
+
+[options.extras_require]
+speedups =
+	aiodns >= 1.1
+	Brotli
+	cchardet; python_version < "3.10"
+docs =
+    sphinx
 `
 
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
@@ -58,7 +72,7 @@ func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 func (s *ConfigParserTestSuite) TestSection(c *C) {
 	sections := s.cfg.Sections()
 	sort.Strings(sections)
-	c.Assert(sections, DeepEquals, []string{"complex", "foo", "service", "testOptions"})
+	c.Assert(sections, DeepEquals, []string{"complex", "foo", "multiline", "options.extras_require", "service", "testOptions"})
 }
 
 func (s *ConfigParserTestSuite) TestOptions(c *C) {
@@ -148,4 +162,10 @@ func (s *ConfigParserTestSuite) TestGetComplex(c *C) {
 	val, err = s.cfg.Get("complex", "json_list")
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, `["foo","bar","with\nnewline"]`)
+}
+
+func (s *ConfigParserTestSuite) TestMultiLineValue(c *C) {
+	val, err := s.cfg.Get("multiline", "install_requires")
+	c.Assert(err, IsNil)
+	c.Assert(val, Equals, strings.Join([]string{"pkginfo >= 1.8.1", "readme-renderer >= 35.0", "requests >= 2.20"}, "\n"))
 }
