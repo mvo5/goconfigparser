@@ -142,7 +142,7 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 					c.sections[curSect].options[key] = append(c.sections[curSect].options[key], value)
 				} else {
 					// ensure sure we do have have a key
-					c.sections[curSect].options[key] = append(c.sections[curSect].options[key])
+					c.sections[curSect].options[key] = c.sections[curSect].options[key]
 				}
 				curOption = key
 			}
