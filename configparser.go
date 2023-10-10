@@ -140,6 +140,9 @@ func (c *ConfigParser) Read(r io.Reader) (err error) {
 				// in case of continuation line, value could be empty
 				if value != "" {
 					c.sections[curSect].options[key] = append(c.sections[curSect].options[key], value)
+				} else {
+					// ensure sure we do have have a key
+					c.sections[curSect].options[key] = append(c.sections[curSect].options[key])
 				}
 				curOption = key
 			}

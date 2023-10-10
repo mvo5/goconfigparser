@@ -60,6 +60,9 @@ speedups =
 	cchardet; python_version < "3.10"
 docs =
     sphinx
+
+[emptyString]
+key=
 `
 
 func (s *ConfigParserTestSuite) SetUpTest(c *C) {
@@ -72,7 +75,7 @@ func (s *ConfigParserTestSuite) SetUpTest(c *C) {
 func (s *ConfigParserTestSuite) TestSection(c *C) {
 	sections := s.cfg.Sections()
 	sort.Strings(sections)
-	c.Assert(sections, DeepEquals, []string{"complex", "foo", "multiline", "options.extras_require", "service", "testOptions"})
+	c.Assert(sections, DeepEquals, []string{"complex", "emptyString", "foo", "multiline", "options.extras_require", "service", "testOptions"})
 }
 
 func (s *ConfigParserTestSuite) TestOptions(c *C) {
@@ -170,4 +173,10 @@ func (s *ConfigParserTestSuite) TestMultiLineValue(c *C) {
 	val, err := s.cfg.Get("multiline", "install_requires")
 	c.Assert(err, IsNil)
 	c.Assert(val, Equals, strings.Join([]string{"pkginfo >= 1.8.1", "readme-renderer >= 35.0", "requests >= 2.20"}, "\n"))
+}
+
+func (s *ConfigParserTestSuite) TestEmptyString(c *C) {
+	val, err := s.cfg.Get("emptyString", "key")
+	c.Assert(err, IsNil)
+	c.Assert(val, Equals, "")
 }
